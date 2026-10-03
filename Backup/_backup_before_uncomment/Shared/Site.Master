@@ -1,0 +1,260 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeFile="Site.Master.cs" Inherits="SiteMaster" %>
+
+<!DOCTYPE html>
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%: Page.Title %> - AeroFly ARS</title>
+
+    <!-- Google Fonts: Outfit (Headings) & Plus Jakarta Sans (Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet" />
+    <!-- Custom Project CSS -->
+    <link href="<%= ResolveUrl("~/Content/css/custom.css") %>" rel="stylesheet" />
+
+    <!-- Early theme hydration script (Prevents flicker) -->
+    <script>
+        (function () {
+            try {
+                var savedTheme = localStorage.getItem('aerofly_theme');
+                var theme = savedTheme || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-theme', theme);
+                document.documentElement.setAttribute('data-bs-theme', theme);
+            } catch (e) { }
+        })();
+    </script>
+
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="mainForm" runat="server">
+        <!-- Main Navigation Bar -->
+        <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center" href="<%= ResolveUrl("~/Public/Home.aspx") %>">
+                    <i class="fa-solid fa-plane-up me-2 text-warning"></i>
+                    <span>Aero<strong>Fly</strong> <small class="text-warning fs-6">ARS</small></span>
+                </a>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" 
+                        aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    <!-- Left / Main Navigation -->
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-lg-center">
+                        <li class="nav-item">
+                            <a class="nav-link" href="<%= ResolveUrl("~/Public/Home.aspx") %>">
+                                <i class="fa-solid fa-house me-1"></i> Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<%= ResolveUrl("~/Public/SearchFlights.aspx") %>">
+                                <i class="fa-solid fa-magnifying-glass me-1"></i> Search Flights
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<%= ResolveUrl("~/Public/FlightDetails.aspx") %>">
+                                <i class="fa-solid fa-clock me-1"></i> Flight Details
+                            </a>
+                        </li>
+
+                        <!-- Manage Booking Services Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="manageBookingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa-solid fa-ticket me-1 text-warning"></i> Manage Booking
+                            </a>
+                            <ul class="dropdown-menu shadow border-0 mt-2" aria-labelledby="manageBookingDropdown" style="border-radius: 10px; min-width: 230px;">
+                                <li>
+                                    <a class="dropdown-item py-2" href="<%= ResolveUrl("~/User/TicketStatus.aspx") %>">
+                                        <i class="fa-solid fa-receipt me-2 text-primary"></i> Check Ticket Status
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-2" href="<%= ResolveUrl("~/User/ConfirmTicket.aspx") %>">
+                                        <i class="fa-solid fa-circle-check me-2 text-success"></i> Confirm Blocked Ticket
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-2" href="<%= ResolveUrl("~/User/RescheduleTicket.aspx") %>">
+                                        <i class="fa-solid fa-arrows-rotate me-2 text-info"></i> Reschedule Flight
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider my-1"></li>
+                                <li>
+                                    <a class="dropdown-item py-2 text-danger" href="<%= ResolveUrl("~/User/CancelTicket.aspx") %>">
+                                        <i class="fa-solid fa-rectangle-xmark me-2"></i> Cancel Ticket &amp; Refund
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <% if (AirlineReservationSystem.UserStateHelper.IsLoggedIn) { %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<%= ResolveUrl("~/User/Dashboard.aspx") %>">
+                                <i class="fa-solid fa-gauge-high me-1"></i> My Dashboard
+                            </a>
+                        </li>
+                        <% if (AirlineReservationSystem.UserStateHelper.IsAdmin) { %>
+                        <li class="nav-item">
+                            <a class="nav-link text-warning fw-bold" href="<%= ResolveUrl("~/Admin/Dashboard.aspx") %>">
+                                <i class="fa-solid fa-screwdriver-wrench me-1"></i> Admin Console
+                            </a>
+                        </li>
+                        <% } %>
+                        <% } %>
+                    </ul>
+
+                    <!-- Right User State / Account Menu -->
+                    <div class="d-flex align-items-center gap-2">
+                        <% if (AirlineReservationSystem.UserStateHelper.IsLoggedIn) { %>
+                            <!-- Frequent Flyer SkyMiles Badge -->
+                            <span class="skymiles-pill d-none d-md-inline-flex align-items-center">
+                                <i class="fa-solid fa-award me-1 text-warning"></i> 
+                                <%= AirlineReservationSystem.UserStateHelper.CurrentSkyMiles %> SkyMiles
+                            </span>
+
+                            <!-- User Account Dropdown -->
+                            <div class="dropdown">
+                                <button class="btn btn-outline-light btn-sm dropdown-toggle d-flex align-items-center gap-2 py-1 px-3 rounded-pill" type="button" id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-solid fa-circle-user fa-lg text-warning"></i>
+                                    <span class="fw-bold"><%= AirlineReservationSystem.UserStateHelper.CurrentUsername %></span>
+                                    <% if (AirlineReservationSystem.UserStateHelper.IsAdmin) { %>
+                                        <span class="badge bg-danger" style="font-size: 0.65rem;">Admin</span>
+                                    <% } %>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-labelledby="userMenuDropdown" style="min-width: 230px; border-radius: 12px;">
+                                    <li class="px-3 py-2 bg-light border-bottom">
+                                        <div class="fw-bold text-dark"><%= AirlineReservationSystem.UserStateHelper.CurrentUsername %></div>
+                                        <small class="text-muted"><i class="fa-solid fa-award text-warning me-1"></i><%= AirlineReservationSystem.UserStateHelper.CurrentSkyMiles %> SkyMiles</small>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item py-2" href="<%= ResolveUrl("~/User/Dashboard.aspx") %>">
+                                            <i class="fa-solid fa-gauge-high me-2 text-primary"></i> My Dashboard
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item py-2" href="<%= ResolveUrl("~/User/MyTickets.aspx") %>">
+                                            <i class="fa-solid fa-receipt me-2 text-primary"></i> My Tickets
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item py-2" href="<%= ResolveUrl("~/User/Profile.aspx") %>">
+                                            <i class="fa-solid fa-id-card me-2 text-info"></i> View Profile
+                                        </a>
+                                    </li>
+                                    <% if (AirlineReservationSystem.UserStateHelper.IsAdmin) { %>
+                                    <li><hr class="dropdown-divider my-1"></li>
+                                    <li>
+                                        <a class="dropdown-item py-2 fw-bold text-danger" href="<%= ResolveUrl("~/Admin/Dashboard.aspx") %>">
+                                            <i class="fa-solid fa-screwdriver-wrench me-2"></i> Admin Operations
+                                        </a>
+                                    </li>
+                                    <% } %>
+                                    <li><hr class="dropdown-divider my-1"></li>
+                                    <li>
+                                        <a class="dropdown-item py-2 text-danger fw-semibold" href="<%= ResolveUrl("~/User/Logout.aspx") %>">
+                                            <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        <% } else { %>
+                            <!-- Guest State View -->
+                            <span class="user-badge-guest d-none d-sm-inline-block">
+                                <i class="fa-solid fa-user-secret me-1"></i> Guest Mode
+                            </span>
+                            <a href="<%= ResolveUrl("~/Public/SearchFlights.aspx") %>" class="btn btn-outline-warning btn-sm" title="Explore system as Guest passenger">
+                                <i class="fa-solid fa-compass me-1"></i> Guest Access
+                            </a>
+                            <a href="<%= ResolveUrl("~/Public/Login.aspx") %>" class="btn btn-outline-light btn-sm px-3">
+                                <i class="fa-solid fa-right-to-bracket me-1"></i> Login
+                            </a>
+                            <a href="<%= ResolveUrl("~/Public/Register.aspx") %>" class="btn btn-warning btn-sm text-dark fw-bold px-3">
+                                <i class="fa-solid fa-user-plus me-1"></i> Register
+                            </a>
+                        <% } %>
+
+                        <!-- Light / Dark Mode Toggle Button -->
+                        <button type="button" class="btn btn-outline-light btn-sm theme-toggle-btn d-flex align-items-center justify-content-center p-2 rounded-circle ms-1" id="themeToggleBtn" title="Toggle Light / Dark Mode" aria-label="Toggle theme">
+                            <i class="fa-solid fa-moon text-warning" id="themeIcon"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Body Content Placeholder -->
+        <main class="flex-grow-1">
+            <asp:ContentPlaceHolder ID="MainContent" runat="server">
+            </asp:ContentPlaceHolder>
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-5 border-top border-secondary">
+            <div class="container">
+                <div class="row align-items-center gy-3">
+                    <div class="col-md-6 text-center text-md-start">
+                        <h6 class="text-white mb-0">
+                            <i class="fa-solid fa-plane text-warning me-2"></i>AeroFly Airline Reservation System (ARS)
+                        </h6>
+                    </div>
+                    <div class="col-md-6 text-center text-md-end">
+                        <p class="small mb-0" style="color: #cbd5e1;">
+                            &copy; <%= DateTime.Now.Year %> <strong class="text-white">AeroFly</strong> Airline Reservation System. All Rights Reserved.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </form>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Theme Toggle Handler -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var toggleBtn = document.getElementById('themeToggleBtn');
+            var themeIcon = document.getElementById('themeIcon');
+
+            function applyThemeUI(theme) {
+                if (themeIcon) {
+                    if (theme === 'dark') {
+                        themeIcon.className = 'fa-solid fa-sun text-warning';
+                        if (toggleBtn) toggleBtn.setAttribute('title', 'Switch to Light Mode');
+                    } else {
+                        themeIcon.className = 'fa-solid fa-moon text-warning';
+                        if (toggleBtn) toggleBtn.setAttribute('title', 'Switch to Dark Mode');
+                    }
+                }
+            }
+
+            var current = document.documentElement.getAttribute('data-theme') || 'light';
+            applyThemeUI(current);
+
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    var active = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', active);
+                    document.documentElement.setAttribute('data-bs-theme', active);
+                    try {
+                        localStorage.setItem('aerofly_theme', active);
+                    } catch (err) { }
+                    applyThemeUI(active);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
